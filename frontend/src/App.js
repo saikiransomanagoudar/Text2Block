@@ -1,28 +1,38 @@
 import React from 'react';
 import { useUser } from '@clerk/clerk-react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LandingPage from './components/LandingPage/LandingPage';
 import SignIn from './components/Authentication/SignIn';
 import SignUp from './components/Authentication/SignUp';
+import HomePage from './components/HomePage/HomePage';
 
 function App() {
-  const { isSignedIn } = useUser();
-  const path = window.location.pathname;
+  const { isSignedIn, isLoaded } = useUser();
 
-  const renderContent = () => {
-    switch (path) {
-      case '/sign-in':
-        return <SignIn />;
-      case '/sign-up':
-        return <SignUp />;
-      default:
-        return <LandingPage />;
-    }
-  };
+  if (!isLoaded) {
+    return null;
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
-      {renderContent()}
-    </div>
+    <Router>
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
+        <Routes>
+          <Route 
+            path="/sign-in" 
+            element={!isSignedIn ? <SignIn /> : <Navigate to="/home" />} 
+          />
+          <Route 
+            path="/sign-up" 
+            element={!isSignedIn ? <SignUp /> : <Navigate to="/home" />} 
+          />
+          <Route 
+            path="/home" 
+            element={isSignedIn ? <HomePage /> : <Navigate to="/sign-in" />} 
+          />
+          <Route path="/" element={<LandingPage />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 

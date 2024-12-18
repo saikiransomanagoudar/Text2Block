@@ -8,7 +8,7 @@ const SignIn = () => {
         <ClerkSignIn 
           routing="path" 
           path="/sign-in" 
-          redirectUrl="/"
+          redirectUrl="/home"
           signUpUrl="/sign-up"
         />
       </div>

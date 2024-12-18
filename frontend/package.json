@@ -19,8 +19,10 @@
   "description": "",
   "dependencies": {
     "@clerk/clerk-react": "^5.20.2",
+    "lucide-react": "^0.468.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-router-dom": "^7.0.2",
     "react-scripts": "^5.0.1",
     "web-vitals": "^4.2.4"
   },
