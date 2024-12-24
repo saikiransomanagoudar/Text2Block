@@ -1,54 +1,54 @@
-#from query_handler import QueryHandler
-from groq_handler import QueryHandler
-def main():
-    """
-    Main function to handle user query, generate DOT code,
-    render a flowchart, and generate a textual explanation.
-    """
-    # Initialize the QueryHandler
-    query_handler = QueryHandler()
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from groq_handler import GrokHandler
+import base64
+import os
 
-    while True:
-        # Get the user query from the command line
-        user_prompt = input("Enter your query (or type 'exit' to quit): ")
+app = Flask(__name__)
+CORS(app)
 
-        if user_prompt.lower() == 'exit':
-            print("Exiting the program...")
-            break  # Exit the loop if the user types 'exit'
+@app.route('/api/analyze', methods=['POST'])
+def analyze():
+    try:
+        # Get the prompt from the request
+        data = request.json
+        user_prompt = data.get('prompt')
+        
+        if not user_prompt:
+            return jsonify({'error': 'No prompt provided'}), 400
 
-        try:
-            # Step 1: Generate DOT code
-            print("\nGenerating DOT code for the flowchart...")
-            dot_code = query_handler.generate_dot_code(user_prompt)
-            print("\nDOT Code:")
-            print(dot_code)
+        # Initialize the GrokHandler
+        query_handler = GrokHandler()
 
-            # Step 2: Validate and render the flowchart
-            print("\nValidating and rendering the flowchart...")
-            output_image_path = query_handler.validate_and_render_dot_code(
-                dot_code,
-                output_file="D:/Projects/BlockAI/Flowchart_responses/flowchart"
-            )
-            print(f"\nFlowchart saved as: {output_image_path}")
+        # Step 1: Generate DOT code
+        dot_code = query_handler.generate_dot_code(user_prompt)
 
-            # Step 3: Display the flowchart
-            #query_handler.display_flowchart(output_image_path)
+        # Step 2: Validate and render the flowchart
+        output_image_path = query_handler.validate_and_render_dot_code(
+            dot_code,
+            output_file="flowchart"
+        )
 
-            # Step 4: Generate textual explanation
-            print("\nGenerating textual explanation for the rendered flowchart...")
-            explanation = query_handler.generate_text_response(dot_code)
-            print("\nTextual Explanation:")
-            print(explanation)
+        # Step 3: Generate textual explanation
+        explanation = query_handler.generate_text_response(dot_code)
 
-            # After generating and displaying the flowchart, ask if the user wants to continue
-            continue_search = input("\nWould you like to search again? (yes/no): ").lower()
-            if continue_search != 'yes':
-                print("Exiting the program...")
-                break  # Exit if the user doesn't want to continue
+        # Step 4: Read and encode the image
+        with open(output_image_path, "rb") as image_file:
+            encoded_image = base64.b64encode(image_file.read()).decode()
 
-        except Exception as e:
-            print(f"An error occurred: {e}")
-            break  # Exit the loop if there's an error
+        if os.path.exists(output_image_path):
+            os.remove(output_image_path)
+        if os.path.exists(output_image_path + ".jpeg"):
+            os.remove(output_image_path + ".jpeg")
 
-if __name__ == "__main__":
-    main()
+        return jsonify({
+            'flowchart': encoded_image,
+            'explanation': explanation
+        })
+
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(port=5000, debug=True)

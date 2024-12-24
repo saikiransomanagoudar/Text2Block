@@ -18,7 +18,7 @@ const HomePage = () => {
     setError('');
 
     try {
-      const response = await fetch('/api/analyze', {
+      const response = await fetch('http://localhost:5000/api/analyze', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -31,9 +31,13 @@ const HomePage = () => {
       }
 
       const data = await response.json();
-      setResult(data);
+      setResult({
+        flowchart: `data:image/jpeg;base64,${data.flowchart}`,
+        explanation: data.explanation
+      });
     } catch (err) {
       setError('Failed to process your request. Please try again.');
+      console.error('Error:', err);
     } finally {
       setIsLoading(false);
     }
@@ -46,12 +50,12 @@ const HomePage = () => {
       <main className="max-w-4xl mx-auto px-4 py-8">
         {/* Input Section */}
         <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <h2 className="text-2xl font-bold mb-4">Enter The Text Prompt</h2>
+          <h2 className="text-2xl font-bold mb-4">Enter Your Text</h2>
           <textarea
             className="w-full h-32 p-3 rounded-lg bg-gray-50 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             value={userPrompt}
             onChange={(e) => setUserPrompt(e.target.value)}
-            placeholder="Enter your text prompt here to generate a flowchart..."
+            placeholder="Enter your text here to generate a flowchart..."
           />
           
           {error && (
@@ -69,6 +73,7 @@ const HomePage = () => {
           </button>
         </div>
 
+        {/* Results Section */}
         {result && (
           <>
             <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
@@ -79,17 +84,7 @@ const HomePage = () => {
                   className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                   title="Expand view"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="15 3 21 3 21 9"></polyline>
                     <polyline points="9 21 3 21 3 15"></polyline>
                     <line x1="21" y1="3" x2="14" y2="10"></line>
@@ -98,7 +93,7 @@ const HomePage = () => {
                 </button>
               </div>
               <div className="w-full h-64 bg-gray-50 rounded-lg p-4 border border-gray-200">
-                {result.flowchart}
+                <img src={result.flowchart} alt="Generated Flowchart" className="w-full h-full object-contain" />
               </div>
             </div>
 
@@ -111,7 +106,8 @@ const HomePage = () => {
           </>
         )}
 
-        {showExpandedView && (
+        {/* Expanded View Modal */}
+        {showExpandedView && result && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-lg w-full max-w-6xl max-h-[90vh] overflow-auto">
               <div className="p-4 flex justify-between items-center border-b">
@@ -124,7 +120,7 @@ const HomePage = () => {
                 </button>
               </div>
               <div className="p-6">
-                {result?.flowchart}
+                <img src={result.flowchart} alt="Generated Flowchart" className="w-full" />
               </div>
             </div>
           </div>

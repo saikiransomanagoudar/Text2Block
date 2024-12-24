@@ -8,10 +8,10 @@ from graphviz import Source
 load_dotenv()
 
 
-class QueryHandler:
+class GrokHandler:
     def __init__(self, model_name="llama-3.3-70b-versatile"):
         """
-        Initializes the QueryHandler with the specified Groq model.
+        Initializes the GrokHandler with the specified Groq model.
         """
         self.groq_api_key = os.getenv("GROQ_API_KEY")
         if not self.groq_api_key:
