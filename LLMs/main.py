@@ -30,7 +30,7 @@ def analyze():
         )
 
         # Step 3: Generate textual explanation
-        explanation = query_handler.generate_text_response(dot_code)
+        explanation = query_handler.generate_text_response(dot_code, user_prompt)
 
         # Step 4: Read and encode the image
         with open(output_image_path, "rb") as image_file:
