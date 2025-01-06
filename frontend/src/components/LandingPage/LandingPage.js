@@ -22,7 +22,7 @@ const LandingPage = () => {
             Convert your text into a flowchart that visualizes the dimension reduction process.
           </p>
           <button
-            onClick={() => handleNavigation(isSignedIn ? '/dashboard' : '/sign-up')}
+            onClick={() => handleNavigation(isSignedIn ? '/home' : '/sign-up')}
             className="px-8 py-3 bg-blue-600 text-white text-lg rounded-lg hover:bg-blue-700 transition-colors"
           >
             Get Started
