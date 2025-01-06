@@ -7,9 +7,20 @@ const SignUp = () => {
       <div className="max-w-md w-full">
         <ClerkSignUp 
           routing="path" 
-          path="/sign-up" 
-          redirectUrl="/"
+          path="/sign-up"
+          afterSignUpUrl="/home"
           signInUrl="/sign-in"
+          appearance={{
+            elements: {
+              formButtonPrimary: 
+                "bg-slate-800 hover:bg-slate-900 text-sm normal-case",
+              socialButtonsBlockButton: 
+                "bg-white hover:bg-gray-50 text-gray-900 text-sm normal-case",
+            },
+            variables: {
+              colorPrimary: '#1a365d',
+            },
+          }}
         />
       </div>
     </div>
