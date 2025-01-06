@@ -1,52 +1,84 @@
-import React, { useState } from 'react';
-import Header from '../Header/Header';
+import React, { useState } from "react";
+import Header from "../Header/Header";
+import { Download } from "lucide-react";
 
 const HomePage = () => {
-  const [userPrompt, setUserPrompt] = useState('');
+  const [userPrompt, setUserPrompt] = useState("");
   const [result, setResult] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [showExpandedView, setShowExpandedView] = useState(false);
 
   const handleSubmit = async () => {
     if (!userPrompt.trim()) {
-      setError('Please enter some text to analyze');
+      setError("Please enter some text to analyze");
       return;
     }
 
     setIsLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const response = await fetch('http://localhost:5000/api/analyze', {
-        method: 'POST',
+      const response = await fetch("http://localhost:5000/api/analyze", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ prompt: userPrompt }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to analyze text');
+        throw new Error("Failed to analyze text");
       }
 
       const data = await response.json();
       setResult({
         flowchart: `data:image/jpeg;base64,${data.flowchart}`,
-        explanation: data.explanation
+        explanation: data.explanation,
       });
     } catch (err) {
-      setError('Failed to process your request. Please try again.');
-      console.error('Error:', err);
+      setError("Failed to process your request. Please try again.");
+      console.error("Error:", err);
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleDownload = () => {
+    const link = document.createElement("a");
+    link.href = result.flowchart;
+    link.download = "flowchart.jpg";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const formatExplanation = (text) => {
+    return text
+      .split("*")
+      .map((point, index) => {
+        if (!point.trim()) return null;
+
+        const formattedPoint = point.replace(
+          /\*\*(.*?)\*\*/g,
+          '<span class="font-bold">$1</span>'
+        );
+
+        return (
+          <li
+            key={index}
+            className="mb-4 ml-2 leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: formattedPoint }}
+          />
+        );
+      })
+      .filter(Boolean);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
       <Header />
-      
+
       <main className="max-w-4xl mx-auto px-4 py-8">
         {/* Input Section */}
         <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
@@ -57,19 +89,21 @@ const HomePage = () => {
             onChange={(e) => setUserPrompt(e.target.value)}
             placeholder="Enter your text here to generate a flowchart..."
           />
-          
+
           {error && (
             <div className="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
               {error}
             </div>
           )}
-          
+          <div className="mt-2 text-sm text-gray-600 italic">
+            Note: Text2Block can make mistakes. Please check important info.
+          </div>
           <button
             onClick={handleSubmit}
             disabled={isLoading}
             className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
           >
-            {isLoading ? 'Processing...' : 'Get Result'}
+            {isLoading ? "Processing..." : "Get Result"}
           </button>
         </div>
 
@@ -84,7 +118,17 @@ const HomePage = () => {
                   className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                   title="Expand view"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <polyline points="15 3 21 3 21 9"></polyline>
                     <polyline points="9 21 3 21 3 15"></polyline>
                     <line x1="21" y1="3" x2="14" y2="10"></line>
@@ -92,16 +136,29 @@ const HomePage = () => {
                   </svg>
                 </button>
               </div>
-              <div className="w-full h-64 bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <img src={result.flowchart} alt="Generated Flowchart" className="w-full h-full object-contain" />
+              <div className="w-full h-64 bg-gray-50 rounded-lg p-4 border border-gray-200 overflow-auto">
+                <img
+                  src={result.flowchart}
+                  alt="Generated Flowchart"
+                  className="w-full object-contain"
+                />
+              </div>
+              <div className="flex justify-end mt-4">
+                <button
+                  onClick={handleDownload}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <Download size={20} />
+                  Download Image
+                </button>
               </div>
             </div>
 
             <div className="bg-white rounded-lg shadow-lg p-6">
               <h2 className="text-2xl font-bold mb-4">Explanation</h2>
-              <div className="prose max-w-none">
-                {result.explanation}
-              </div>
+              <ul className="list-disc pl-6 space-y-2">
+                {formatExplanation(result.explanation)}
+              </ul>
             </div>
           </>
         )}
@@ -120,7 +177,20 @@ const HomePage = () => {
                 </button>
               </div>
               <div className="p-6">
-                <img src={result.flowchart} alt="Generated Flowchart" className="w-full" />
+                <img
+                  src={result.flowchart}
+                  alt="Generated Flowchart"
+                  className="w-full"
+                />
+                <div className="flex justify-end mt-4">
+                  <button
+                    onClick={handleDownload}
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    <Download size={20} />
+                    Download Image
+                  </button>
+                </div>
               </div>
             </div>
           </div>
