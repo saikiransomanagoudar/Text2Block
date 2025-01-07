@@ -8,7 +8,6 @@ const SignIn = () => {
         <ClerkSignIn 
           routing="path" 
           path="/sign-in"
-          afterSignInUrl="/home"
           signUpUrl="/sign-up"
           appearance={{
             elements: {

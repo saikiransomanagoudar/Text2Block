@@ -39,6 +39,10 @@ function App() {
             element={!isSignedIn ? <SignUp /> : <Navigate to="/home" />}
           />
           <Route
+            path="/sign-up/sso-callback"
+            element={!isSignedIn ? <SignUp /> : <Navigate to="/home" />}
+          />
+          <Route
             path="/home"
             element={isSignedIn ? <HomePage /> : <Navigate to="/sign-in" />}
           />
