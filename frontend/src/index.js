@@ -5,11 +5,6 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-console.log('Environment variables:', {
-  clerkKey: process.env.REACT_APP_CLERK_PUBLISHABLE_KEY,
-  nodeEnv: process.env.NODE_ENV
-});
-
 const clerkPubKey = process.env.REACT_APP_CLERK_PUBLISHABLE_KEY;
 
 if (!clerkPubKey) {

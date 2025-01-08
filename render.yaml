@@ -1,12 +1,11 @@
 services:
   - type: web
-    name: text2block-backend
-    env: python
-    buildCommand: |
-      cd LLMs
-      pip install -r requirements.txt
-      apt-get update && apt-get install -y graphviz
-    startCommand: cd LLMs && gunicorn main:app
+    name: text2block-frontend
+    env: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./build
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.8.1
+      - key: REACT_APP_CLERK_PUBLISHABLE_KEY
+        sync: false
+      - key: REACT_APP_API_URL
+        value: https://text2block-backend.onrender.com
