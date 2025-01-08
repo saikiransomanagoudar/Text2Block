@@ -9,5 +9,4 @@ services:
     startCommand: cd LLMs && gunicorn main:app
     envVars:
       - key: PYTHON_VERSION
-        value: 3.9
-        
+        value: 3.8.1
