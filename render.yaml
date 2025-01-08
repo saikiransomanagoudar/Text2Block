@@ -1,0 +1,31 @@
+services:
+  # Backend Web Service
+  - type: web
+    name: text2block-backend
+    env: python
+    buildCommand: |
+      cd LLMs
+      pip install -r requirements.txt
+      apt-get update && apt-get install -y graphviz
+    startCommand: cd LLMs && gunicorn main:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+
+  # Frontend Static Site
+  - type: static
+    name: text2block-frontend
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/build
+    envVars:
+      - key: REACT_APP_CLERK_PUBLISHABLE_KEY
+        sync: false
+      - key: REACT_APP_API_URL
+        fromService:
+          type: web
+          name: text2block-backend
+          envVarKey: RENDER_EXTERNAL_URL
