@@ -9,6 +9,16 @@ const HomePage = () => {
   const [error, setError] = useState("");
   const [showExpandedView, setShowExpandedView] = useState(false);
 
+  const samplePrompts = [
+    "Can you explain the bubble sorting algorithm in detail with this array example [23, 290, 12, 7, 439, 1222] in ascending order.",
+    "Can you help me with the process of making Paneer Tikka Masala.",
+    "Explain the detailed process of glycolysis."
+  ];
+
+  const handleSamplePromptClick = (prompt) => {
+    setUserPrompt(prompt);
+  };
+
   const handleSubmit = async () => {
     if (!userPrompt.trim()) {
       setError("Please enter some text to analyze");
@@ -132,30 +142,57 @@ const HomePage = () => {
 
       <main className="px-4 py-8">
         {/* Input Section */}
-        <div className="max-w-4xl mx-auto mb-6">
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-bold mb-4">Enter Your Text</h2>
+        <div className="max-w-4xl mx-auto mb-8">
+          <div className="bg-gray-800/50 backdrop-blur-lg rounded-xl shadow-2xl p-8 border border-gray-700">
+            {/* Description */}
+            <div className="mb-8 text-center">
+              <h2 className="text-3xl font-bold text-white mb-4">Text2Block</h2>
+              <p className="text-gray-300 text-lg mb-6">
+                Introducing Text2Block, an advanced AI solution that transforms prompts into dynamic flowcharts, providing both visual and detailed textual insights.
+              </p>
+              <p className="text-gray-400">
+                You can try the below prompts to test our model or choose your own.
+              </p>
+            </div>
+
+            {/* Sample Prompts */}
+            <div className="grid gap-2 mb-6">
+              {samplePrompts.map((prompt, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleSamplePromptClick(prompt)}
+                  className="text-left p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-md text-gray-300 transition-all duration-200 hover:shadow-lg border border-gray-600 hover:border-gray-500 text-sm"
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
+
+            {/* Text Input */}
             <textarea
-              className="w-full h-32 p-3 rounded-lg bg-gray-50 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full h-40 p-4 rounded-lg bg-white border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 text-gray-800 placeholder-gray-500 transition-all duration-200"
               value={userPrompt}
               onChange={(e) => setUserPrompt(e.target.value)}
-              placeholder="Enter your text here to generate a flowchart..."
+              placeholder="Enter your text here to generate a flowchart or diagram..."
+              style={{ resize: 'vertical' }}
             />
 
             {error && (
-              <div className="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+              <div className="mt-4 p-4 bg-red-900/50 border border-red-700 text-red-200 rounded-lg">
                 {error}
               </div>
             )}
-            <div className="mt-2 text-sm text-gray-600 italic">
+            
+            <div className="mt-2 text-sm text-gray-400 italic">
               Note: Text2Block can make mistakes. Please check important info.
             </div>
+            
             <button
               onClick={handleSubmit}
               disabled={isLoading}
-              className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+              className="mt-4 px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
             >
-              {isLoading ? "Processing..." : "Get Result"}
+              {isLoading ? "Processing..." : "Generate Flowchart"}
             </button>
           </div>
         </div>

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <!-- Background squares/blocks representing flowchart -->
+  <g fill="#4287f5">
+    <!-- Connected blocks suggesting a flowchart -->
+    <rect x="72" y="24" width="24" height="24" rx="6"/>
+    <rect x="24" y="48" width="24" height="24" rx="6"/>
+    <rect x="72" y="72" width="24" height="24" rx="6"/>
+    
+    <!-- Connecting lines -->
+    <path d="M84 48 L84 72 M48 60 L72 60" stroke="#4287f5" stroke-width="6"/>
+  </g>
+
+  <!-- Text-like elements -->
+  <g fill="#ffffff">
+    <!-- Simplified text lines -->
+    <rect x="30" y="18" width="36" height="6" rx="3"/>
+    <rect x="30" y="30" width="24" height="6" rx="3"/>
+    <rect x="90" y="54" width="12" height="6" rx="3"/>
+    <rect x="30" y="96" width="30" height="6" rx="3"/>
+  </g>
+
+  <!-- Gradient overlay for depth -->
+  <rect x="0" y="0" width="120" height="120" fill="url(#overlay)" fill-opacity="0.1"/>
+  
+  <defs>
+    <linearGradient id="overlay" x1="0" y1="0" x2="120" y2="120">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+</svg>

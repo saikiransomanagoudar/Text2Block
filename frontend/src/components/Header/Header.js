@@ -1,6 +1,7 @@
 import React from "react";
 import { useUser, useClerk } from "@clerk/clerk-react";
 import { useNavigate } from 'react-router-dom';
+import logo from './logo.svg'; // Add this import
 
 const Header = () => {
   const { isSignedIn, user } = useUser();
@@ -14,12 +15,13 @@ const Header = () => {
   return (
     <nav className="p-4">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
-        <h1
+        {/* Replace the h1 with an img element */}
+        <img
+          src={logo}
+          alt="Text2Block"
           onClick={() => handleNavigation("/")}
-          className="text-white text-2xl font-bold cursor-pointer"
-        >
-          Text2Block
-        </h1>
+          className="h-8 cursor-pointer" // Adjust height as needed
+        />
 
         {isSignedIn ? (
           <div className="flex items-center gap-4">
