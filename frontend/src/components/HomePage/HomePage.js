@@ -30,15 +30,54 @@ const HomePage = () => {
       if (!response.ok) {
         throw new Error("Failed to analyze text");
       }
-
       const data = await response.json();
+      const processExplanation = (text) => {
+        try {
+          if (typeof text !== 'string') {
+            return text.explanation || text;
+          }
+
+          let cleanText = text;
+          if (cleanText.includes('```')) {
+            cleanText = cleanText.replace(/```\w*\n/g, '').replace(/\n```/g, '');
+          }
+
+          let parsedData;
+          try {
+
+            parsedData = JSON.parse(cleanText);
+          } catch (e) {
+            try {
+
+              cleanText = cleanText.replace(/\\\"/g, '"').replace(/\\/g, '');
+              parsedData = JSON.parse(cleanText);
+            } catch (e2) {
+
+              cleanText = cleanText.replace(/^"(.*)"$/, '$1');
+              parsedData = JSON.parse(cleanText);
+            }
+          }
+
+          return parsedData.explanation || parsedData;
+        } catch (error) {
+          console.error('Error parsing explanation:', error);
+          return {
+            overview: 'Error processing explanation',
+            details: [{
+              heading: 'Raw Response',
+              description: text
+            }]
+          };
+        }
+      };
+
       setResult({
         flowchart: `data:image/jpeg;base64,${data.flowchart}`,
-        explanation: data.explanation,
+        explanation: processExplanation(data.explanation)
       });
-    } catch (err) {
-      setError("Failed to process your request. Please try again.");
-      console.error("Error:", err);
+    } catch (error) {
+      setError("Failed to process the response. Please try again.");
+      console.error("Error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -53,114 +92,134 @@ const HomePage = () => {
     document.body.removeChild(link);
   };
 
-  const formatExplanation = (text) => {
-    return text
-      .split("*")
-      .map((point, index) => {
-        if (!point.trim()) return null;
+  const renderExplanation = () => {
+    if (!result?.explanation) return null;
 
-        const formattedPoint = point.replace(
-          /\*\*(.*?)\*\*/g,
-          '<span class="font-bold">$1</span>'
-        );
+    const { overview, details } = result.explanation;
 
-        return (
-          <li
-            key={index}
-            className="mb-4 ml-2 leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: formattedPoint }}
-          />
-        );
-      })
-      .filter(Boolean);
+    return (
+      <div className="space-y-6">
+        {overview && (
+          <div className="mb-6">
+            <h3 className="text-xl font-semibold mb-3">Overview</h3>
+            <p className="text-gray-700 leading-relaxed">{overview}</p>
+          </div>
+        )}
+        
+        {details && details.length > 0 && (
+          <div>
+            <h3 className="text-xl font-semibold mb-3">Details</h3>
+            <div className="space-y-4">
+              {details.map((detail, index) => (
+                <div 
+                  key={index} 
+                  className="bg-gray-50 rounded-lg p-4"
+                >
+                  <h4 className="font-semibold text-lg mb-2">{detail.heading}</h4>
+                  <p className="text-gray-700 leading-relaxed">{detail.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
       <Header />
 
-      <main className="max-w-4xl mx-auto px-4 py-8">
+      <main className="px-4 py-8">
         {/* Input Section */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <h2 className="text-2xl font-bold mb-4">Enter Your Text</h2>
-          <textarea
-            className="w-full h-32 p-3 rounded-lg bg-gray-50 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            value={userPrompt}
-            onChange={(e) => setUserPrompt(e.target.value)}
-            placeholder="Enter your text here to generate a flowchart..."
-          />
+        <div className="max-w-4xl mx-auto mb-6">
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h2 className="text-2xl font-bold mb-4">Enter Your Text</h2>
+            <textarea
+              className="w-full h-32 p-3 rounded-lg bg-gray-50 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              value={userPrompt}
+              onChange={(e) => setUserPrompt(e.target.value)}
+              placeholder="Enter your text here to generate a flowchart..."
+            />
 
-          {error && (
-            <div className="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-              {error}
+            {error && (
+              <div className="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                {error}
+              </div>
+            )}
+            <div className="mt-2 text-sm text-gray-600 italic">
+              Note: Text2Block can make mistakes. Please check important info.
             </div>
-          )}
-          <div className="mt-2 text-sm text-gray-600 italic">
-            Note: Text2Block can make mistakes. Please check important info.
+            <button
+              onClick={handleSubmit}
+              disabled={isLoading}
+              className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+            >
+              {isLoading ? "Processing..." : "Get Result"}
+            </button>
           </div>
-          <button
-            onClick={handleSubmit}
-            disabled={isLoading}
-            className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-          >
-            {isLoading ? "Processing..." : "Get Result"}
-          </button>
         </div>
 
         {/* Results Section */}
         {result && (
-          <>
-            <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-bold">Flowchart Result</h2>
-                <button
-                  onClick={() => setShowExpandedView(true)}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                  title="Expand view"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-6">
+            {/* Flowchart Result */}
+            <div className="w-full md:w-1/2">
+              <div className="bg-white rounded-lg shadow-lg p-6 h-full">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-2xl font-bold">Flowchart Result</h2>
+                  <button
+                    onClick={() => setShowExpandedView(true)}
+                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                    title="Expand view"
                   >
-                    <polyline points="15 3 21 3 21 9"></polyline>
-                    <polyline points="9 21 3 21 3 15"></polyline>
-                    <line x1="21" y1="3" x2="14" y2="10"></line>
-                    <line x1="3" y1="21" x2="10" y2="14"></line>
-                  </svg>
-                </button>
-              </div>
-              <div className="w-full h-64 bg-gray-50 rounded-lg p-4 border border-gray-200 overflow-auto">
-                <img
-                  src={result.flowchart}
-                  alt="Generated Flowchart"
-                  className="w-full object-contain"
-                />
-              </div>
-              <div className="flex justify-end mt-4">
-                <button
-                  onClick={handleDownload}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  <Download size={20} />
-                  Download Image
-                </button>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="15 3 21 3 21 9"></polyline>
+                      <polyline points="9 21 3 21 3 15"></polyline>
+                      <line x1="21" y1="3" x2="14" y2="10"></line>
+                      <line x1="3" y1="21" x2="10" y2="14"></line>
+                    </svg>
+                  </button>
+                </div>
+                <div className="w-full h-[calc(100vh-24rem)] bg-gray-50 rounded-lg p-4 border border-gray-200 overflow-auto">
+                  <img
+                    src={result.flowchart}
+                    alt="Generated Flowchart"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="flex justify-end mt-4">
+                  <button
+                    onClick={handleDownload}
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    <Download size={20} />
+                    Download Image
+                  </button>
+                </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h2 className="text-2xl font-bold mb-4">Explanation</h2>
-              <ul className="list-disc pl-6 space-y-2">
-                {formatExplanation(result.explanation)}
-              </ul>
+            {/* Explanation Section */}
+            <div className="w-full md:w-1/2">
+              <div className="bg-white rounded-lg shadow-lg p-6 h-full">
+                <h2 className="text-2xl font-bold mb-4">Explanation</h2>
+                <div className="overflow-auto h-[calc(100vh-20rem)]">
+                  {renderExplanation()}
+                </div>
+              </div>
             </div>
-          </>
+          </div>
         )}
 
         {/* Expanded View Modal */}
