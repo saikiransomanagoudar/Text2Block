@@ -34,7 +34,7 @@ class GrokHandler:
             f"Based on the following query, generate DOT language code:\n\n"
             f"The User Query is : {user_prompt} \n\n"
             f"Follow these **guidelines** while generating the DOT code:\n\n"
-            f"1. Begin the DOT code with [resolution=1300] to ensure high resolution.\n"
+            f"1. Begin the DOT code with [resolution=900] to ensure high resolution.\n"
             f"2. STRICTLY The graph name **must not** contain spaces, but node and edge names may include spaces."
             f"  - for example [digraph MDSembeddingsplot] is right way of naming a graph, but not [digraph MDS embeddings plot]\n"
             f"3. The dot code MUST contain digraph or graph or any type of graph available in GRAPHVIZ library suitable to the user query "

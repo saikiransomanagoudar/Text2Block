@@ -1,6 +1,8 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from groq_handler import GrokHandler
+#from groq_handler import GrokHandler
+#from openrouter_llms import QueryHandler
+from router_groq_llms import GrokHandler
 import base64
 import os
 
@@ -19,7 +21,7 @@ def analyze():
 
         # Initialize the GrokHandler
         query_handler = GrokHandler()
-
+       
         # Step 1: Generate DOT code
         dot_code = query_handler.generate_dot_code(user_prompt)
 
