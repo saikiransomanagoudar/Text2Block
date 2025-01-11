@@ -10,6 +10,7 @@ import LandingPage from "./components/LandingPage/LandingPage";
 import SignIn from "./components/Authentication/SignIn";
 import SignUp from "./components/Authentication/SignUp";
 import HomePage from "./components/HomePage/HomePage";
+import ContactUs from "./components/ContactUs/ContactUs";
 
 function App() {
   const { isSignedIn, isLoaded } = useUser();
@@ -46,6 +47,7 @@ function App() {
             path="/home"
             element={isSignedIn ? <HomePage /> : <Navigate to="/sign-in" />}
           />
+          <Route path="/contact-us" element={<ContactUs />} />
           <Route path="/" element={<LandingPage />} />
         </Routes>
       </div>

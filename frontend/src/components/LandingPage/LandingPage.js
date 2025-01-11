@@ -20,9 +20,7 @@ const LandingPage = () => {
             Introducing Text2Block
           </h2>
           <p className="text-xl text-gray-300 mb-12 leading-relaxed">
-            Our new AI-powered application is designed to revolutionize your learning 
-            journey by seamlessly combining visual diagrams with insightful text for an 
-            enhanced understanding.
+            Transform complex ideas into crystal-clear visuals! Our AI-powered magic turns your text into stunning flowcharts, paired with smart insights that make learning effortless.
           </p>
           <button
             onClick={() => handleNavigation(isSignedIn ? '/home' : '/sign-up')}

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Header from "../Header/Header";
 import { Download } from "lucide-react";
+import LoadingAnimation from "../LoadingAnimation";
 
 const HomePage = () => {
   const [userPrompt, setUserPrompt] = useState("");
@@ -10,9 +11,9 @@ const HomePage = () => {
   const [showExpandedView, setShowExpandedView] = useState(false);
 
   const samplePrompts = [
-    "Can you explain the bubble sorting algorithm in detail with this array example [23, 290, 12, 7, 439, 1222] in ascending order.",
-    "Can you help me with the process of making Paneer Tikka Masala.",
-    "Explain the detailed process of glycolysis."
+    "Explain the Bubble sorting algorithm in detail with an array example.",
+    "Help me with the process of making Masoor Dal.",
+    "Explain the detailed process of Glycolysis.",
   ];
 
   const handleSamplePromptClick = (prompt) => {
@@ -29,13 +30,16 @@ const HomePage = () => {
     setError("");
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/analyze`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ prompt: userPrompt }),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/analyze`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ prompt: userPrompt }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to analyze text");
@@ -43,47 +47,48 @@ const HomePage = () => {
       const data = await response.json();
       const processExplanation = (text) => {
         try {
-          if (typeof text !== 'string') {
+          if (typeof text !== "string") {
             return text.explanation || text;
           }
 
           let cleanText = text;
-          if (cleanText.includes('```')) {
-            cleanText = cleanText.replace(/```\w*\n/g, '').replace(/\n```/g, '');
+          if (cleanText.includes("```")) {
+            cleanText = cleanText
+              .replace(/```\w*\n/g, "")
+              .replace(/\n```/g, "");
           }
 
           let parsedData;
           try {
-
             parsedData = JSON.parse(cleanText);
           } catch (e) {
             try {
-
-              cleanText = cleanText.replace(/\\\"/g, '"').replace(/\\/g, '');
+              cleanText = cleanText.replace(/\\\"/g, '"').replace(/\\/g, "");
               parsedData = JSON.parse(cleanText);
             } catch (e2) {
-
-              cleanText = cleanText.replace(/^"(.*)"$/, '$1');
+              cleanText = cleanText.replace(/^"(.*)"$/, "$1");
               parsedData = JSON.parse(cleanText);
             }
           }
 
           return parsedData.explanation || parsedData;
         } catch (error) {
-          console.error('Error parsing explanation:', error);
+          console.error("Error parsing explanation:", error);
           return {
-            overview: 'Error processing explanation',
-            details: [{
-              heading: 'Raw Response',
-              description: text
-            }]
+            overview: "Error processing explanation",
+            details: [
+              {
+                heading: "Raw Response",
+                description: text,
+              },
+            ],
           };
         }
       };
 
       setResult({
         flowchart: `data:image/jpeg;base64,${data.flowchart}`,
-        explanation: processExplanation(data.explanation)
+        explanation: processExplanation(data.explanation),
       });
     } catch (error) {
       setError("Failed to process the response. Please try again.");
@@ -115,18 +120,19 @@ const HomePage = () => {
             <p className="text-gray-700 leading-relaxed">{overview}</p>
           </div>
         )}
-        
+
         {details && details.length > 0 && (
           <div>
             <h3 className="text-xl font-semibold mb-3">Details</h3>
             <div className="space-y-4">
               {details.map((detail, index) => (
-                <div 
-                  key={index} 
-                  className="bg-gray-50 rounded-lg p-4"
-                >
-                  <h4 className="font-semibold text-lg mb-2">{detail.heading}</h4>
-                  <p className="text-gray-700 leading-relaxed">{detail.description}</p>
+                <div key={index} className="bg-gray-50 rounded-lg p-4">
+                  <h4 className="font-semibold text-lg mb-2">
+                    {detail.heading}
+                  </h4>
+                  <p className="text-gray-700 leading-relaxed">
+                    {detail.description}
+                  </p>
                 </div>
               ))}
             </div>
@@ -148,10 +154,11 @@ const HomePage = () => {
             <div className="mb-8 text-center">
               <h2 className="text-3xl font-bold text-white mb-4">Text2Block</h2>
               <p className="text-gray-300 text-lg mb-6">
-                Introducing Text2Block, an advanced AI solution that transforms prompts into dynamic flowcharts, providing both visual and detailed textual insights.
+                Where your words take shape: Text2Block turns your ideas into
+                vibrant flowcharts, complete with AI-powered insights
               </p>
               <p className="text-gray-400">
-                You can try the below prompts to test our model or choose your own.
+                Ready to flow? Dive into these starter prompts
               </p>
             </div>
 
@@ -173,8 +180,8 @@ const HomePage = () => {
               className="w-full h-40 p-4 rounded-lg bg-white border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 text-gray-800 placeholder-gray-500 transition-all duration-200"
               value={userPrompt}
               onChange={(e) => setUserPrompt(e.target.value)}
-              placeholder="Enter your text here to generate a flowchart or diagram..."
-              style={{ resize: 'vertical' }}
+              placeholder="Transform your thoughts into flowing diagrams..."
+              style={{ resize: "vertical" }}
             />
 
             {error && (
@@ -182,17 +189,17 @@ const HomePage = () => {
                 {error}
               </div>
             )}
-            
+
             <div className="mt-2 text-sm text-gray-400 italic">
               Note: Text2Block can make mistakes. Please check important info.
             </div>
-            
+
             <button
               onClick={handleSubmit}
               disabled={isLoading}
-              className="mt-4 px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+              className="mt-4 px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium flex items-center justify-center gap-2"
             >
-              {isLoading ? "Processing..." : "Generate Flowchart"}
+              {isLoading ? <LoadingAnimation /> : "Blockify!"}
             </button>
           </div>
         </div>
@@ -204,7 +211,7 @@ const HomePage = () => {
             <div className="w-full md:w-1/2">
               <div className="bg-white rounded-lg shadow-lg p-6 h-full">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-2xl font-bold">Flowchart Result</h2>
+                  <h2 className="text-2xl font-bold">Result</h2>
                   <button
                     onClick={() => setShowExpandedView(true)}
                     className="p-2 hover:bg-gray-100 rounded-full transition-colors"

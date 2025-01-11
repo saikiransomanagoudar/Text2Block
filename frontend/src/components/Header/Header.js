@@ -1,7 +1,7 @@
 import React from "react";
 import { useUser, useClerk } from "@clerk/clerk-react";
-import { useNavigate } from 'react-router-dom';
-import logo from './logo.svg'; // Add this import
+import { useNavigate } from "react-router-dom";
+import logo from "./logo.svg";
 
 const Header = () => {
   const { isSignedIn, user } = useUser();
@@ -15,18 +15,22 @@ const Header = () => {
   return (
     <nav className="p-4">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
-        {/* Replace the h1 with an img element */}
         <img
           src={logo}
           alt="Text2Block"
           onClick={() => handleNavigation("/")}
-          className="h-8 cursor-pointer" // Adjust height as needed
+          className="h-8 cursor-pointer"
         />
-
         {isSignedIn ? (
           <div className="flex items-center gap-4">
             <button
-              onClick={() => handleNavigation('/home')}
+              onClick={() => handleNavigation("/contact-us")}
+              className="px-4 py-2 text-white hover:bg-gray-700 rounded-lg transition-colors"
+            >
+              Contact Us
+            </button>
+            <button
+              onClick={() => handleNavigation("/home")}
               className="px-4 py-2 text-white hover:bg-gray-700 rounded-lg transition-colors"
             >
               Home
@@ -43,6 +47,12 @@ const Header = () => {
           </div>
         ) : (
           <div className="space-x-4">
+            <button
+              onClick={() => handleNavigation("/contact-us")}
+              className="px-4 py-2 text-white hover:bg-gray-700 rounded-lg transition-colors"
+            >
+              Contact Us
+            </button>
             <button
               onClick={() => handleNavigation("/sign-in")}
               className="px-4 py-2 text-white hover:bg-gray-700 rounded-lg transition-colors"
